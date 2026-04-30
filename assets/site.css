@@ -180,9 +180,17 @@ footer    { padding-bottom: env(safe-area-inset-bottom); }
   content:""; position:absolute; top:0; left:1.25rem; right:1.25rem; height:2px;
   background: linear-gradient(90deg, #DC2626, transparent);
 }
-/* Reveal-on-scroll */
-.reveal { opacity:0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
-.reveal.in { opacity:1; transform: translateY(0); }
+/* Reveal-on-scroll — content is visible by default, JS opts INTO the
+   fade-up animation by adding `.js` to <html>. This guarantees content is
+   never invisible if JS or IntersectionObserver lags on mobile. */
+.reveal { opacity:1; transform: none; transition: opacity .7s ease, transform .7s ease; }
+.js .reveal { opacity:0; transform: translateY(18px); }
+.js .reveal.in { opacity:1; transform: translateY(0); }
+@media (max-width: 1023px) {
+  /* On mobile, never hide content for the fade-in. The animation is purely
+     a desktop affordance. */
+  .js .reveal { opacity:1; transform: none; }
+}
 /* Hero diagonal stripe */
 .stripe {
   background-image: repeating-linear-gradient(135deg, rgba(220,38,38,.14) 0 12px, transparent 12px 32px);
