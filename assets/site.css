@@ -11,12 +11,29 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-/* Subtle film grain overlay for cinematic feel */
-body::before {
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:1;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  opacity:.4; mix-blend-mode: overlay;
+/* Subtle film grain overlay for cinematic feel — desktop only.
+   Disabled on mobile because iOS Safari renders SVG turbulence + mix-blend-mode
+   as a solid black overlay. */
+@media (min-width: 1024px) {
+  body::before {
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity:.35; mix-blend-mode: overlay;
+  }
 }
+
+/* Mobile robustness ----------------------------------------------------------
+   - Tame heavy blur filters that iOS Safari sometimes paints as solid black.
+   - Show reveal-on-scroll content immediately on small screens (don't wait
+     for IntersectionObserver, which can lag on iOS first-paint). */
+@media (max-width: 1023px) {
+  .blur-3xl { filter: blur(36px) !important; }
+  .reveal   { opacity: 1 !important; transform: none !important; }
+}
+
+/* Respect iOS notch / safe area when viewport-fit=cover is set */
+header#nav { padding-top: env(safe-area-inset-top); }
+footer    { padding-bottom: env(safe-area-inset-bottom); }
 .display { font-family: Anton, Impact, sans-serif; letter-spacing:-.02em; line-height:.92; text-transform:uppercase; }
 .tight   { font-family: 'Inter Tight', Inter, sans-serif; }
 .red-bar { background: linear-gradient(90deg,#DC2626 0%, #EF4444 100%); }
